@@ -1,0 +1,22 @@
+{
+  "name": "zweer-serverless-utils",
+  "version": "0.0.1",
+  "description": "A bunch of utilities for the serverless world",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZweerServerless/utils.git"
+  },
+  "keywords": [
+    "serverless"
+  ],
+  "author": "Niccolò Olivieri <niccolo@olivieriachille.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZweerServerless/utils/issues"
+  },
+  "homepage": "https://github.com/ZweerServerless/utils#readme"
+}
