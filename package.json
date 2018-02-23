@@ -17,5 +17,12 @@
   "bugs": {
     "url": "https://github.com/ZweerServerless/utils/issues"
   },
-  "homepage": "https://github.com/ZweerServerless/utils#readme"
+  "homepage": "https://github.com/ZweerServerless/utils#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dynamoose": "^0.8.6"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.202.0"
+  }
 }
