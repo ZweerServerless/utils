@@ -1,13 +1,11 @@
 import zlib from 'zlib';
-import axios from 'axios';
-import { SNS, CloudWatchLogs } from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
+import { CloudWatchLogs } from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 
-import Configuration from '../models/configuration';
 import log from '../libraries/log';
+import { ingest } from '../libraries/logdna';
+import { enqueueTelegramMessage } from '../libraries/telegram';
 
 import { isTelegramLog, calculateTelegramCustomLog } from '../../utils-prj/logs';
-
-const logdnaTokenKey = 'logdnaToken';
 
 function mapEvent(logEvent, logGroup) {
   const { timestamp, message } = logEvent;
@@ -106,18 +104,7 @@ async function archiveLogEvents(logEvents) {
     return;
   }
 
-  const logdnaToken = await Configuration.getValue(logdnaTokenKey);
-
-  await axios.post('https://logs.logdna.com/logs/ingest', { lines }, {
-    params: {
-      hostname: logEvents[0].lambdaFunction || logEvents[0].logGroup,
-      now: Date.now(),
-    },
-
-    auth: {
-      username: logdnaToken,
-    },
-  });
+  await ingest(logEvents[0].lambdaFunction || logEvents[0].logGroup, lines);
 }
 
 async function handleLogEvent(logEvent) {
@@ -132,13 +119,7 @@ async function handleLogEvent(logEvent) {
   }
 
   if (telegramMessage) {
-    const sns = new SNS();
-    const snsErrorTopicArn = process.env.SNS_TELEGRAM;
-
-    await sns.publish({
-      Message: telegramMessage,
-      TopicArn: snsErrorTopicArn,
-    }).promise();
+    await enqueueTelegramMessage(telegramMessage);
   }
 }
 
