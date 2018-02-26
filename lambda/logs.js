@@ -5,6 +5,8 @@ import { SNS, CloudWatchLogs } from 'aws-sdk'; // eslint-disable-line import/no-
 import Configuration from '../models/configuration';
 import log from '../libraries/log';
 
+import { isTelegramLog, calculateTelegramCustomLog } from '../../utils-prj/logs';
+
 const logdnaTokenKey = 'logdnaToken';
 
 function mapEvent(logEvent, logGroup) {
@@ -121,16 +123,12 @@ async function archiveLogEvents(logEvents) {
 async function handleLogEvent(logEvent) {
   let telegramMessage;
 
-  if (
-    (logEvent.type === 'message' && logEvent.level === 'error')
-    ||
-    (logEvent.logger === 'scrape' && logEvent.levelIndex < 3)
-  ) {
+  if ((logEvent.type === 'message' && logEvent.level === 'error') || isTelegramLog(logEvent)) {
     telegramMessage = `${logEvent.level.toUpperCase()} [${logEvent.logger}] - ${logEvent.message}`;
   }
 
-  if (logEvent.type === 'report' && parseInt(logEvent.duration, 10) > 2000) {
-    telegramMessage = `ERROR [lambda-duration] function ${logEvent.lambdaFunction} took too long: ${logEvent.duration} ms`;
+  if (!telegramMessage) {
+    telegramMessage = calculateTelegramCustomLog(logEvent);
   }
 
   if (telegramMessage) {
